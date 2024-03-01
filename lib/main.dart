@@ -1,180 +1,136 @@
-import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'Namer App',
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-        ),
-        home: MyHomePage(),
-      ),
+    return MaterialApp(
+      home: CounterScreen(),
     );
   }
 }
 
-class MyAppState extends ChangeNotifier {
-  var current = WordPair.random();
-
-  void getNext() {
-    current = WordPair.random();
-    notifyListeners();
-  }
-
-  // ↓ Add the code below.
-  var favorites = <WordPair>[];
-
-  void toggleFavorite() {
-    if (favorites.contains(current)) {
-      favorites.remove(current);
-    } else {
-      favorites.add(current);
-    }
-    notifyListeners();
-  }
+class CounterScreen extends StatefulWidget {
+  @override
+  _CounterScreenState createState() => _CounterScreenState();
 }
 
-class MyHomePage extends StatefulWidget {
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+class _CounterScreenState extends State<CounterScreen> {
+  int _counter = 0;
 
-class _MyHomePageState extends State<MyHomePage> {
-  var selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget page;
-    switch (selectedIndex) {
-      case 0:
-        page = GeneratorPage();
-        break;
-      case 1:
-        page = Placeholder();
-        break;
-      default:
-        throw UnimplementedError('no widget for $selectedIndex');
-    }
-
-    return LayoutBuilder(builder: (context, constraints) {
-      return Scaffold(
-        body: Row(
-          children: [
-            SafeArea(
-              child: NavigationRail(
-                extended: constraints.maxWidth >= 600,  // ← Here.
-                destinations: [
-                  NavigationRailDestination(
-                    icon: Icon(Icons.home),
-                    label: Text('Home'),
-                  ),
-                  NavigationRailDestination(
-                    icon: Icon(Icons.favorite),
-                    label: Text('Favorites'),
-                  ),
-                ],
-                selectedIndex: selectedIndex,
-                onDestinationSelected: (value) {
-                  setState(() {
-                    selectedIndex = value;
-                  });
-                },
-              ),
-            ),
-            Expanded(
-              child: Container(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                child: page,
-              ),
-            ),
-          ],
-        ),
-      );
+  void _incrementCounter() {
+    setState(() {
+      if (_counter < 10) {
+        _counter++;
+      } else {
+        _showAlertDialog("Cannot Increment", "You cannot increment more.");
+      }
     });
   }
-}
-class GeneratorPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    var appState = context.watch<MyAppState>();
-    var pair = appState.current;
 
-    IconData icon;
-    if (appState.favorites.contains(pair)) {
-      icon = Icons.favorite;
-    } else {
-      icon = Icons.favorite_border;
-    }
+  void _decrementCounter() {
+    setState(() {
+      if (_counter > 1) {
+        _counter--;
+      } else {
+        _showAlertDialog("Cannot Decrement", "You cannot decrement more.");
+      }
+    });
+  }
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          BigCard(pair: pair),
-          SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {
-                  appState.toggleFavorite();
-                },
-                icon: Icon(icon),
-                label: Text('Like'),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  appState.getNext();
-                },
-                child: Text('Next'),
-              ),
-            ],
-          ),
-        ],
-      ),
+  void _showAlertDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
     );
   }
-}
-
-class BigCard extends StatelessWidget {
-  const BigCard({
-    super.key,
-    required this.pair,
-  });
-
-  final WordPair pair;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    );
-
-    return Card(
-      color: theme.colorScheme.primary,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-
-        // ↓ Make the following change.
-        child: Text(
-          pair.asLowerCase,
-          style: style,
-          semanticsLabel: "${pair.first} ${pair.second}",
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(
+          child: Text(
+            'Home', // Title text
+            style: TextStyle(
+              fontSize: 20, // Font size
+              color: Colors.white, // Font color
+            ),
+          ),
         ),
+        backgroundColor: Colors.green[500], // Parrot green background
+      ),
+      body: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'You have pushed the button $_counter times',
+                ),
+                Text(
+                  '$_counter',
+                  style: TextStyle(fontSize: 60, fontWeight: FontWeight.w300),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: _decrementCounter,
+                      child: Text(
+                        '-',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.green[500], // Parrot green background
+                      ),
+                    ),
+                    SizedBox(width: 5), // Add some spacing between the buttons
+                    ElevatedButton(
+                      onPressed: _incrementCounter,
+                      child: Text(
+                        '+',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.green[500], // Parrot green background
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+           Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton(
+              onPressed: _incrementCounter,
+              backgroundColor: Colors.green[500], // Parrot green background
+              foregroundColor: Colors.white, // White font color
+              child: Icon(Icons.add),
+              shape: CircleBorder(), // Circular shape
+            ),
+          ),
+        ],
       ),
     );
   }
