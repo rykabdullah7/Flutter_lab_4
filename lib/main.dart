@@ -1,137 +1,35 @@
 import 'package:flutter/material.dart';
+import 'views/bottom_navigation_page.dart';
+import 'views/login_page.dart';
+import 'views/profile_page.dart';
+import 'views/top_navigation_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: CounterScreen(),
-    );
-  }
-}
-
-class CounterScreen extends StatefulWidget {
-  @override
-  _CounterScreenState createState() => _CounterScreenState();
-}
-
-class _CounterScreenState extends State<CounterScreen> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      if (_counter < 10) {
-        _counter++;
-      } else {
-        _showAlertDialog("Cannot Increment", "You cannot increment more.");
-      }
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      if (_counter > 1) {
-        _counter--;
-      } else {
-        _showAlertDialog("Cannot Decrement", "You cannot decrement more.");
-      }
-    });
-  }
-
-  void _showAlertDialog(String title, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const LoginPage(),
+        '/profile': (context) => const ProfilePage(),
+        '/top_navigation': (context) => const TopNavigationPage(),
+        '/bottom_navigation': (context) => const BottomNavigationPage(),
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(
-          child: Text(
-            'Home', // Title text
-            style: TextStyle(
-              fontSize: 20, // Font size
-              color: Colors.white, // Font color
-            ),
-          ),
-        ),
-        backgroundColor: Colors.green[500], // Parrot green background
-      ),
-      body: Stack(
-        children: [
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'You have pushed the button $_counter times',
-                ),
-                Text(
-                  '$_counter',
-                  style: TextStyle(fontSize: 60, fontWeight: FontWeight.w300),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    ElevatedButton(
-                      onPressed: _decrementCounter,
-                      child: Text(
-                        '-',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.green[500], // Parrot green background
-                      ),
-                    ),
-                    SizedBox(width: 5), // Add some spacing between the buttons
-                    ElevatedButton(
-                      onPressed: _incrementCounter,
-                      child: Text(
-                        '+',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.green[500], // Parrot green background
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-           Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton(
-              onPressed: _incrementCounter,
-              backgroundColor: Colors.green[500], // Parrot green background
-              foregroundColor: Colors.white, // White font color
-              child: Icon(Icons.add),
-              shape: CircleBorder(), // Circular shape
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
